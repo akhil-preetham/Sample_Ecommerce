@@ -1,15 +1,39 @@
-# IDE
-.idea/
-.vscode/
-*.swp
-*.swo
-*~
-*.iml
-.DS_Store
+# =============================================================================
+# Enterprise E-Commerce Platform — .gitignore
+# Covers: Java, Maven, Spring Boot, React, Node.js, IntelliJ IDEA, VS Code,
+#         Windows, macOS, Linux, Docker, Qodana, Logs, Temp files
+# =============================================================================
 
-# Build
+
+# -----------------------------------------------------------------------------
+# MAVEN BUILD OUTPUT
+# -----------------------------------------------------------------------------
 target/
-out/
+!.mvn/wrapper/maven-wrapper.jar
+!**/src/main/**/target/
+!**/src/test/**/target/
+
+# Maven wrapper (keep the jar, ignore downloaded binaries)
+.mvn/wrapper/maven-wrapper.properties
+!.mvn/wrapper/maven-wrapper.properties
+
+# Maven release plugin artifacts
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+pom.xml.next
+release.properties
+dependency-reduced-pom.xml
+buildNumber.properties
+.mvn/timing.properties
+
+# Maven effective POM (generated, not source)
+effective-pom.xml
+**/effective-pom.xml
+
+# -----------------------------------------------------------------------------
+# JAVA COMPILED OUTPUT
+# -----------------------------------------------------------------------------
 *.class
 *.jar
 *.war
@@ -19,41 +43,229 @@ out/
 *.tar.gz
 *.rar
 
-# Maven
-pom.xml.tag
-pom.xml.releaseBackup
-pom.xml.versionsBackup
-pom.xml.next
-release.properties
-dependency-reduced-pom.xml
+# Generated sources (MapStruct, Lombok, APT)
+**/target/generated-sources/
+**/target/generated-test-sources/
 
-# Gradle
+# -----------------------------------------------------------------------------
+# SPRING BOOT
+# -----------------------------------------------------------------------------
+# Spring Boot fat jar originals
+*.jar.original
+
+# Spring Boot DevTools restart trigger
+.spring-boot-devtools.properties
+
+# -----------------------------------------------------------------------------
+# GRADLE (if ever added)
+# -----------------------------------------------------------------------------
 .gradle/
 build/
+!gradle/wrapper/gradle-wrapper.jar
+!**/src/main/**/build/
+!**/src/test/**/build/
 
-# Node (Frontend)
+# -----------------------------------------------------------------------------
+# INTELLIJ IDEA
+# -----------------------------------------------------------------------------
+.idea/
+*.iws
+*.iml
+*.ipr
+out/
+
+# IntelliJ module files in subdirectories
+**/*.iml
+
+# -----------------------------------------------------------------------------
+# VS CODE
+# -----------------------------------------------------------------------------
+.vscode/
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+*.code-workspace
+.history/
+
+# -----------------------------------------------------------------------------
+# ECLIPSE / STS
+# -----------------------------------------------------------------------------
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings/
+.springBeans
+.sts4-cache
+bin/
+!**/src/main/**/bin/
+!**/src/test/**/bin/
+
+# NetBeans
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+
+# -----------------------------------------------------------------------------
+# NODE.JS / REACT / FRONTEND
+# -----------------------------------------------------------------------------
 node_modules/
-dist/
-.next/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+.pnpm-store/
 
-# Environment
+# Build output
+dist/
+dist-ssr/
+.next/
+.nuxt/
+.output/
+.cache/
+.parcel-cache/
+
+# Vite
+*.local
+
+# TypeScript
+*.tsbuildinfo
+
+# Package lock files (keep package-lock.json or yarn.lock — pick one per project)
+# Uncomment the one you do NOT use:
+# package-lock.json
+# yarn.lock
+
+# -----------------------------------------------------------------------------
+# ENVIRONMENT & SECRETS — NEVER COMMIT
+# -----------------------------------------------------------------------------
 .env
 .env.local
+.env.development
+.env.development.local
+.env.test
+.env.test.local
+.env.production
+.env.production.local
 .env.*.local
+secrets.yml
+secrets.yaml
+application-secrets.yml
+application-secrets.yaml
+*-secrets.properties
 
-# Logs
-logs/
-*.log
-
-# OS
-Thumbs.db
-.DS_Store
-
-# Security
+# Private keys and certificates
 *.pem
 *.key
 *.crt
-secrets.yml
+*.p12
+*.jks
+*.keystore
+*.truststore
 
-# Docker
-.dockerignore
+# -----------------------------------------------------------------------------
+# LOGS
+# -----------------------------------------------------------------------------
+logs/
+*.log
+*.log.*
+log/
+spring.log
+
+# -----------------------------------------------------------------------------
+# DOCKER GENERATED / RUNTIME
+# -----------------------------------------------------------------------------
+# Keep: Dockerfile, docker-compose.yml, .dockerignore (these are source)
+# Ignore: runtime volumes, override files with local secrets
+docker-compose.override.yml
+docker-compose.local.yml
+.docker/
+
+# -----------------------------------------------------------------------------
+# QODANA (CI code quality)
+# -----------------------------------------------------------------------------
+.qodana/
+qodana.sarif.json
+
+# -----------------------------------------------------------------------------
+# OS GENERATED FILES
+# -----------------------------------------------------------------------------
+
+# Windows
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+ehthumbs_vista.db
+Desktop.ini
+$RECYCLE.BIN/
+*.lnk
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+.Spotlight-V100
+.Trashes
+.fseventsd
+.TemporaryItems
+.VolumeIcon.icns
+.com.apple.timemachine.donotpresent
+
+# Linux
+*~
+.fuse_hidden*
+.directory
+.Trash-*
+.nfs*
+
+# -----------------------------------------------------------------------------
+# EDITOR SWAP / TEMP FILES
+# -----------------------------------------------------------------------------
+*.swp
+*.swo
+*.swn
+*.bak
+*.tmp
+*.temp
+*.orig
+*.rej
+*.patch
+
+# Lock files created by editors (IntelliJ, Emacs, etc.)
+.LCKpom.xml~
+*.LCK*
+\#*\#
+.\#*
+
+# -----------------------------------------------------------------------------
+# TEMPORARY BUILD ARTIFACTS & ANALYSIS OUTPUT
+# -----------------------------------------------------------------------------
+build_output*.txt
+tracked_files.txt
+*.txt.bak
+
+# Maven site
+**/target/site/
+
+# JaCoCo coverage reports
+**/target/jacoco.exec
+**/jacoco-report/
+
+# Surefire / Failsafe test reports
+**/target/surefire-reports/
+**/target/failsafe-reports/
+
+# -----------------------------------------------------------------------------
+# JUNIE (AI assistant workspace metadata)
+# -----------------------------------------------------------------------------
+.junie/
+
+# -----------------------------------------------------------------------------
+# GITHUB ACTIONS MODERNIZE HOOKS (generated tooling metadata)
+# -----------------------------------------------------------------------------
+.github/modernize/

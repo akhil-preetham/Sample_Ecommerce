@@ -1,5 +1,6 @@
 package com.ecommerce.inventory.service.impl;
 
+import com.ecommerce.inventory.dto.StockMovementDTO;
 import com.ecommerce.inventory.entity.StockMovement;
 import com.ecommerce.inventory.repository.StockMovementRepository;
 import com.ecommerce.inventory.service.StockMovementService;
@@ -11,7 +12,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -44,20 +44,17 @@ public class StockMovementServiceImpl implements StockMovementService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<Object> getMovementHistory(String inventoryItemId) {
+    public List<StockMovementDTO> getMovementHistory(String inventoryItemId) {
         log.debug("Getting movement history for item: {}", inventoryItemId);
-        
-        List<StockMovement> movements = stockMovementRepository.findByInventoryItemId(inventoryItemId);
-        
-        return movements.stream()
-            .map(m -> new Object() {
-                public final String id = m.getId();
-                public final String movementType = m.getMovementType();
-                public final Long quantity = m.getQuantity();
-                public final String reference = m.getReference();
-                public final String reason = m.getReason();
-                public final LocalDateTime createdAt = m.getCreatedAt();
-            })
-            .collect(Collectors.toList());
+        return stockMovementRepository.findByInventoryItemId(inventoryItemId).stream()
+            .map(m -> StockMovementDTO.builder()
+                .id(m.getId())
+                .movementType(m.getMovementType())
+                .quantity(m.getQuantity())
+                .reference(m.getReference())
+                .reason(m.getReason())
+                .createdAt(m.getCreatedAt())
+                .build())
+            .toList();
     }
 }

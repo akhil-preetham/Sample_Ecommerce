@@ -1,5 +1,6 @@
 package com.ecommerce.user.controller;
 
+import com.ecommerce.common.config.JwtUtil;
 import com.ecommerce.common.constant.AppConstants;
 import com.ecommerce.common.dto.ResponseWrapper;
 import com.ecommerce.user.dto.LoginRequest;
@@ -21,9 +22,11 @@ import org.springframework.web.bind.annotation.*;
 public class AuthController {
 
     private final AuthenticationService authenticationService;
+    private final JwtUtil jwtUtil;
 
-    public AuthController(AuthenticationService authenticationService) {
+    public AuthController(AuthenticationService authenticationService, JwtUtil jwtUtil) {
         this.authenticationService = authenticationService;
+        this.jwtUtil = jwtUtil;
     }
 
     @PostMapping("/register")
@@ -110,7 +113,8 @@ public class AuthController {
 
     private String extractUserIdFromToken(String authHeader) {
         if (authHeader != null && authHeader.startsWith(AppConstants.BEARER_PREFIX)) {
-            return authHeader.substring(AppConstants.BEARER_PREFIX.length());
+            String token = authHeader.substring(AppConstants.BEARER_PREFIX.length());
+            return jwtUtil.extractUserId(token);
         }
         throw new IllegalArgumentException("Invalid authorization header");
     }

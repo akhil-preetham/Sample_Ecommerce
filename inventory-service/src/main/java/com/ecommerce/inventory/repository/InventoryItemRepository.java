@@ -15,5 +15,7 @@ public interface InventoryItemRepository extends BaseRepository<InventoryItem, S
 
     List<InventoryItem> findByAvailableStockLessThanEqual(Long reorderLevel);
 
+    List<InventoryItem> findByAvailableStockLessThanEqualAndWarehouseId(Long reorderLevel, String warehouseId);
+
     List<InventoryItem> findByProductVariantIdAndReservedStockGreaterThan(String productVariantId, Long reserved);
 }

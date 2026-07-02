@@ -5,7 +5,7 @@ spring:
     config:
       server:
         git:
-          uri: file://${user.home}/config-repo
+          uri: file:///${user.dir}/config-server/config-repo
           searchPaths: "/"
           default-label: main
   security:

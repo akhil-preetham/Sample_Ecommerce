@@ -1,5 +1,7 @@
 package com.ecommerce.inventory.service;
 
+import com.ecommerce.inventory.dto.StockReservationDTO;
+
 import java.util.List;
 
 public interface ReservationService {
@@ -12,5 +14,5 @@ public interface ReservationService {
 
     void cancelReservation(String orderId);
 
-    List<Object> getReservationsByOrder(String orderId);
+    List<StockReservationDTO> getReservationsByOrder(String orderId);
 }

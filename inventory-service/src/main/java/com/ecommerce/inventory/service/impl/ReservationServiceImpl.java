@@ -1,5 +1,6 @@
 package com.ecommerce.inventory.service.impl;
 
+import com.ecommerce.inventory.dto.StockReservationDTO;
 import com.ecommerce.inventory.entity.StockReservation;
 import com.ecommerce.inventory.exception.ItemNotFoundException;
 import com.ecommerce.inventory.repository.StockReservationRepository;
@@ -11,7 +12,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -105,18 +105,15 @@ public class ReservationServiceImpl implements ReservationService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<Object> getReservationsByOrder(String orderId) {
+    public List<StockReservationDTO> getReservationsByOrder(String orderId) {
         log.debug("Getting reservations for order: {}", orderId);
-        
-        var reservations = stockReservationRepository.findByOrderId(orderId);
-        
-        return reservations.stream()
-            .map(r -> new Object() {
-                public final String id = r.getId();
-                public final String inventoryItemId = r.getInventoryItemId();
-                public final Long quantity = r.getQuantity();
-                public final String status = r.getStatus();
-            })
-            .collect(Collectors.toList());
+        return stockReservationRepository.findByOrderId(orderId).stream()
+            .map(r -> StockReservationDTO.builder()
+                .id(r.getId())
+                .inventoryItemId(r.getInventoryItemId())
+                .quantity(r.getQuantity())
+                .status(r.getStatus())
+                .build())
+            .toList();
     }
 }

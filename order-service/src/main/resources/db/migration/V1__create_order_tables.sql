@@ -64,7 +64,7 @@ CREATE TABLE IF NOT EXISTS orders (
     updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     created_by VARCHAR(36),
     updated_by VARCHAR(36),
-    FOREIGN KEY (user_id) REFERENCES user_service_db.users(id),
+    -- user_id references user-service by ID convention (no cross-DB FK in microservices)
     INDEX idx_user_id (user_id),
     INDEX idx_order_number (order_number),
     INDEX idx_status (status),
