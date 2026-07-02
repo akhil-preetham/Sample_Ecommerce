@@ -1,0 +1,28 @@
+# Product Service Configuration
+spring:
+  application:
+    name: product-service
+  datasource:
+    url: jdbc:mysql://${DB_HOST:localhost}:${DB_PORT:3306}/product_service_db?useSSL=true&serverTimezone=UTC
+    username: ${DB_USERNAME:root}
+    password: ${DB_PASSWORD:rootpassword}
+
+server:
+  port: 8082
+
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://admin:admin@localhost:8761/eureka/
+  instance:
+    preferIpAddress: false
+
+---
+spring:
+  config:
+    activate:
+      on-profile: prod
+
+eureka:
+  instance:
+    instanceId: ${spring.application.name}:${random.value}

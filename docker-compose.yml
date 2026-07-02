@@ -1,0 +1,153 @@
+version: '3.8'
+
+services:
+  # MySQL Databases
+  mysql-user-db:
+    image: mysql:8.0
+    container_name: user-service-db
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: user_service_db
+    ports:
+      - "3306:3306"
+    volumes:
+      - user_db_data:/var/lib/mysql
+    networks:
+      - ecommerce-network
+    healthcheck:
+      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost" ]
+      timeout: 20s
+      retries: 10
+
+  mysql-product-db:
+    image: mysql:8.0
+    container_name: product-service-db
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: product_service_db
+    ports:
+      - "3307:3306"
+    volumes:
+      - product_db_data:/var/lib/mysql
+    networks:
+      - ecommerce-network
+    healthcheck:
+      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost" ]
+      timeout: 20s
+      retries: 10
+
+  mysql-inventory-db:
+    image: mysql:8.0
+    container_name: inventory-service-db
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: inventory_service_db
+    ports:
+      - "3308:3306"
+    volumes:
+      - inventory_db_data:/var/lib/mysql
+    networks:
+      - ecommerce-network
+    healthcheck:
+      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost" ]
+      timeout: 20s
+      retries: 10
+
+  mysql-order-db:
+    image: mysql:8.0
+    container_name: order-service-db
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: order_service_db
+    ports:
+      - "3309:3306"
+    volumes:
+      - order_db_data:/var/lib/mysql
+    networks:
+      - ecommerce-network
+    healthcheck:
+      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost" ]
+      timeout: 20s
+      retries: 10
+
+  mysql-payment-db:
+    image: mysql:8.0
+    container_name: payment-service-db
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: payment_service_db
+    ports:
+      - "3310:3306"
+    volumes:
+      - payment_db_data:/var/lib/mysql
+    networks:
+      - ecommerce-network
+    healthcheck:
+      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost" ]
+      timeout: 20s
+      retries: 10
+
+  mysql-notification-db:
+    image: mysql:8.0
+    container_name: notification-service-db
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: notification_service_db
+    ports:
+      - "3311:3306"
+    volumes:
+      - notification_db_data:/var/lib/mysql
+    networks:
+      - ecommerce-network
+    healthcheck:
+      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost" ]
+      timeout: 20s
+      retries: 10
+
+  # Redis Cache
+  redis:
+    image: redis:7-alpine
+    container_name: ecommerce-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - ecommerce-network
+    healthcheck:
+      test: [ "CMD", "redis-cli", "ping" ]
+      timeout: 20s
+      retries: 10
+
+  # RabbitMQ Message Queue
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    container_name: ecommerce-rabbitmq
+    environment:
+      RABBITMQ_DEFAULT_USER: admin
+      RABBITMQ_DEFAULT_PASS: admin
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    networks:
+      - ecommerce-network
+    healthcheck:
+      test: [ "CMD", "rabbitmq-diagnostics", "ping" ]
+      timeout: 20s
+      retries: 10
+
+volumes:
+  user_db_data:
+  product_db_data:
+  inventory_db_data:
+  order_db_data:
+  payment_db_data:
+  notification_db_data:
+  redis_data:
+  rabbitmq_data:
+
+networks:
+  ecommerce-network:
+    driver: bridge

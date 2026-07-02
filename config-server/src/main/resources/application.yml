@@ -1,0 +1,28 @@
+spring:
+  application:
+    name: config-server
+  cloud:
+    config:
+      server:
+        git:
+          uri: file://${user.home}/config-repo
+          searchPaths: "/"
+          default-label: main
+  security:
+    user:
+      name: admin
+      password: ${CONFIG_SERVER_PASSWORD:admin}
+
+server:
+  port: 8888
+
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://admin:admin@localhost:8761/eureka/
+  instance:
+    preferIpAddress: false
+
+logging:
+  level:
+    root: INFO

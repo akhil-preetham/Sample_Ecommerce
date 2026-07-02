@@ -1,0 +1,29 @@
+spring:
+  application:
+    name: discovery-server
+  security:
+    user:
+      name: admin
+      password: ${EUREKA_PASSWORD:admin}
+
+server:
+  port: 8761
+
+eureka:
+  instance:
+    hostname: localhost
+  client:
+    registerWithEureka: false
+    fetchRegistry: false
+    serviceUrl:
+      defaultZone: http://${eureka.instance.hostname}:${server.port}/eureka/
+  server:
+    enableSelfPreservation: false
+    responseCacheUpdateIntervalMs: 3000
+    shouldUseReadOnlyResponseCache: false
+
+logging:
+  level:
+    root: INFO
+    com.netflix.eureka: WARN
+    com.netflix.discovery: WARN

@@ -1,0 +1,53 @@
+spring:
+  application:
+    name: order-service
+  config:
+    import: optional:configserver:http://localhost:8888
+  datasource:
+    url: jdbc:mysql://localhost:3306/order_service_db?useSSL=true&serverTimezone=UTC
+    username: root
+    password: rootpassword
+    hikari:
+      maximum-pool-size: 20
+      minimum-idle: 5
+  jpa:
+    hibernate:
+      ddl-auto: validate
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+
+server:
+  port: 8084
+
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://admin:admin@localhost:8761/eureka/
+  instance:
+    preferIpAddress: false
+    instanceId: ${spring.application.name}:${random.value}
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+
+resilience4j:
+  circuitbreaker:
+    instances:
+      inventory-service:
+        slidingWindowSize: 10
+        failureRateThreshold: 50
+        waitDurationInOpenState: 5000
+        permittedNumberOfCallsInHalfOpenState: 3
+
+  retry:
+    instances:
+      inventory-service:
+        maxAttempts: 3
+        waitDuration: 1000
+
+logging:
+  level:
+    root: INFO
+    com.ecommerce: DEBUG
