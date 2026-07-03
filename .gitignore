@@ -269,3 +269,9 @@ tracked_files.txt
 # GITHUB ACTIONS MODERNIZE HOOKS (generated tooling metadata)
 # -----------------------------------------------------------------------------
 .github/modernize/
+# =============================================================================
+# LOCAL RUNTIME FILES (DO NOT COMMIT)
+# =============================================================================
+runtime/
+runtime/**
+mysql-data/
