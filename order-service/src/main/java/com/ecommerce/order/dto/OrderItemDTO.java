@@ -25,4 +25,7 @@ public class OrderItemDTO {
 
     @Schema(description = "Unit price at time of order", example = "99.99")
     private BigDecimal price;
+
+    @Schema(description = "Computed line subtotal", example = "199.98")
+    private BigDecimal subtotal;
 }

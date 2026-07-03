@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import com.ecommerce.common.entity.BaseEntity;
 
@@ -11,6 +12,7 @@ import com.ecommerce.common.entity.BaseEntity;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@EqualsAndHashCode(callSuper = true)
 @Entity
 @Table(name = "user_addresses", indexes = {
     @Index(name = "idx_user_id", columnList = "user_id"),
@@ -43,6 +45,7 @@ public class UserAddress extends BaseEntity {
     private String country;
 
     @Column(name = "is_default")
+    @Builder.Default
     private Boolean isDefault = false;
 
     @Column(name = "recipient_name")

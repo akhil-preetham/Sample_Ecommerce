@@ -1,13 +1,13 @@
 spring:
   application:
     name: config-server
+  profiles:
+    active: ${SPRING_PROFILES_ACTIVE:native}
   cloud:
     config:
       server:
-        git:
-          uri: file:///${user.dir}/config-server/config-repo
-          searchPaths: "/"
-          default-label: main
+        native:
+          search-locations: ${CONFIG_REPO_LOCATION:file:///c:/Projects/Enterprise-ECommerce/config-repo}
   security:
     user:
       name: admin
@@ -19,9 +19,9 @@ server:
 eureka:
   client:
     serviceUrl:
-      defaultZone: http://admin:admin@localhost:8761/eureka/
+      defaultZone: ${EUREKA_CLIENT_SERVICEURL_DEFAULTZONE:http://admin:admin@localhost:8761/eureka/}
   instance:
-    preferIpAddress: false
+    preferIpAddress: true
 
 logging:
   level:

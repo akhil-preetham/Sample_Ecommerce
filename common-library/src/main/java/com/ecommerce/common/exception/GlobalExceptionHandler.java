@@ -1,6 +1,7 @@
 package com.ecommerce.common.exception;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -16,15 +17,16 @@ import java.time.LocalDateTime;
 
 @Slf4j
 @RestControllerAdvice
+@ConditionalOnWebApplication(type = ConditionalOnWebApplication.Type.SERVLET)
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(ResourceNotFoundException.class)
     public ResponseEntity<ErrorResponse> handleResourceNotFound(
             ResourceNotFoundException ex,
             WebRequest request) {
-        
+
         log.warn("Resource not found: {}", ex.getMessage());
-        
+
         ErrorResponse errorResponse = ErrorResponse.builder()
             .timestamp(LocalDateTime.now())
             .status(HttpStatus.NOT_FOUND.value())
@@ -33,7 +35,7 @@ public class GlobalExceptionHandler {
             .path(request.getDescription(false).replace("uri=", ""))
             .traceId(MDC.get("traceId"))
             .build();
-        
+
         return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
     }
 
@@ -41,9 +43,9 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleValidationException(
             ValidationException ex,
             WebRequest request) {
-        
+
         log.warn("Validation error: {}", ex.getMessage());
-        
+
         ErrorResponse errorResponse = ErrorResponse.builder()
             .timestamp(LocalDateTime.now())
             .status(HttpStatus.BAD_REQUEST.value())
@@ -52,7 +54,7 @@ public class GlobalExceptionHandler {
             .path(request.getDescription(false).replace("uri=", ""))
             .traceId(MDC.get("traceId"))
             .build();
-        
+
         return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
     }
 
@@ -60,14 +62,14 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleMethodArgumentNotValid(
             MethodArgumentNotValidException ex,
             WebRequest request) {
-        
+
         String message = ex.getBindingResult().getFieldErrors().stream()
             .map(error -> error.getField() + ": " + error.getDefaultMessage())
             .reduce((a, b) -> a + "; " + b)
             .orElse("Validation failed");
-        
+
         log.warn("Method argument validation failed: {}", message);
-        
+
         ErrorResponse errorResponse = ErrorResponse.builder()
             .timestamp(LocalDateTime.now())
             .status(HttpStatus.BAD_REQUEST.value())
@@ -76,7 +78,7 @@ public class GlobalExceptionHandler {
             .path(request.getDescription(false).replace("uri=", ""))
             .traceId(MDC.get("traceId"))
             .build();
-        
+
         return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
     }
 
@@ -84,9 +86,9 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleGenericException(
             Exception ex,
             WebRequest request) {
-        
+
         log.error("Unexpected error occurred", ex);
-        
+
         ErrorResponse errorResponse = ErrorResponse.builder()
             .timestamp(LocalDateTime.now())
             .status(HttpStatus.INTERNAL_SERVER_ERROR.value())
@@ -95,7 +97,7 @@ public class GlobalExceptionHandler {
             .path(request.getDescription(false).replace("uri=", ""))
             .traceId(MDC.get("traceId"))
             .build();
-        
+
         return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }

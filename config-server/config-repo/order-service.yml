@@ -1,11 +1,19 @@
-# Order Service Configuration
 spring:
   application:
     name: order-service
   datasource:
-    url: jdbc:mysql://${DB_HOST:localhost}:${DB_PORT:3306}/order_service_db?useSSL=true&serverTimezone=UTC
+    url: jdbc:mysql://${ORDER_DB_HOST:127.0.0.1}:${ORDER_DB_PORT:3406}/order_service_db?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true&createDatabaseIfNotExist=true
     username: ${DB_USERNAME:root}
-    password: ${DB_PASSWORD:rootpassword}
+    password: ${DB_PASSWORD:${MYSQL_ROOT_PASSWORD:rootpassword}}
+  jpa:
+    hibernate:
+      ddl-auto: update
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+    url: jdbc:mysql://${ORDER_DB_HOST:127.0.0.1}:${ORDER_DB_PORT:3406}/order_service_db?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true&createDatabaseIfNotExist=true
+    user: ${DB_USERNAME:root}
+    password: ${DB_PASSWORD:${MYSQL_ROOT_PASSWORD:rootpassword}}
 
 server:
   port: 8084

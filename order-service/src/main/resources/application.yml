@@ -2,17 +2,21 @@ spring:
   application:
     name: order-service
   config:
-    import: optional:configserver:http://localhost:8888
+    import: optional:configserver:${SPRING_CLOUD_CONFIG_URI:http://localhost:8888}
+  cloud:
+    config:
+      username: ${CONFIG_SERVER_USERNAME:admin}
+      password: ${CONFIG_SERVER_PASSWORD:admin}
   datasource:
-    url: jdbc:mysql://localhost:3306/order_service_db?useSSL=true&serverTimezone=UTC
-    username: root
-    password: rootpassword
+    url: jdbc:mysql://${ORDER_DB_HOST:localhost}:${ORDER_DB_PORT:3309}/order_service_db?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true&createDatabaseIfNotExist=true
+    username: ${DB_USERNAME:root}
+    password: ${DB_PASSWORD:rootpassword}
     hikari:
       maximum-pool-size: 20
       minimum-idle: 5
   jpa:
     hibernate:
-      ddl-auto: validate
+      ddl-auto: update
   flyway:
     enabled: true
     locations: classpath:db/migration
@@ -23,7 +27,7 @@ server:
 eureka:
   client:
     serviceUrl:
-      defaultZone: http://admin:admin@localhost:8761/eureka/
+      defaultZone: ${EUREKA_CLIENT_SERVICEURL_DEFAULTZONE:http://admin:admin@localhost:8761/eureka/}
   instance:
     preferIpAddress: false
     instanceId: ${spring.application.name}:${random.value}

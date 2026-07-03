@@ -27,6 +27,7 @@ public class CreatePaymentRequest {
     @Schema(description = "Payment amount", example = "1500.50")
     private BigDecimal amount;
 
+    @Builder.Default
     @NotBlank(message = "Currency is required")
     @Schema(description = "Currency code", example = "INR", defaultValue = "INR")
     private String currency = "INR";

@@ -6,6 +6,7 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
@@ -14,6 +15,7 @@ import java.util.*;
 
 @Slf4j
 @Component
+@ConditionalOnWebApplication(type = ConditionalOnWebApplication.Type.SERVLET)
 public class JwtUtil {
 
     @Value("${jwt.secret}")
@@ -26,7 +28,12 @@ public class JwtUtil {
     private long refreshTokenExpiration;
 
     private SecretKey getSigningKey() {
-        return Keys.hmacShaKeyFor(secretKey.getBytes(StandardCharsets.UTF_8));
+        byte[] keyBytes = secretKey.getBytes(StandardCharsets.UTF_8);
+        // Ensure key is at least 32 bytes for HS256
+        if (keyBytes.length < 32) {
+            keyBytes = Arrays.copyOf(keyBytes, 32);
+        }
+        return Keys.hmacShaKeyFor(keyBytes);
     }
 
     public String generateAccessToken(String userId, Collection<String> roles) {
@@ -76,7 +83,6 @@ public class JwtUtil {
                     .verifyWith(getSigningKey())
                     .build()
                     .parseSignedClaims(token);
-
             return !isTokenExpired(token);
         } catch (JwtException | IllegalArgumentException e) {
             log.warn("Token validation failed: {}", e.getMessage());

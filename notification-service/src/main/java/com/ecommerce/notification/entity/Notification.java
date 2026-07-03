@@ -5,8 +5,10 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.EqualsAndHashCode;
 import com.ecommerce.common.entity.BaseEntity;
 
+@EqualsAndHashCode(callSuper = false)
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -34,6 +36,7 @@ public class Notification extends BaseEntity {
     @Column(name = "message", columnDefinition = "TEXT")
     private String message;
 
+    @Builder.Default
     @Column(name = "is_read", nullable = false)
     private Boolean isRead = false;
 

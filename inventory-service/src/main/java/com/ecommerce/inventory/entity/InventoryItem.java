@@ -5,8 +5,10 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.EqualsAndHashCode;
 import com.ecommerce.common.entity.BaseEntity;
 
+@EqualsAndHashCode(callSuper = false)
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -28,15 +30,19 @@ public class InventoryItem extends BaseEntity {
     @Column(name = "warehouse_id", nullable = false)
     private String warehouseId;
 
+    @Builder.Default
     @Column(name = "available_stock", nullable = false)
     private Long availableStock = 0L;
 
+    @Builder.Default
     @Column(name = "reserved_stock", nullable = false)
     private Long reservedStock = 0L;
 
+    @Builder.Default
     @Column(name = "reorder_level")
     private Long reorderLevel = 10L;
 
+    @Builder.Default
     @Version
     @Column(name = "version")
     private Long version = 0L;

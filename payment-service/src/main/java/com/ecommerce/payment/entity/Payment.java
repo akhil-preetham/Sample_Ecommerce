@@ -5,9 +5,11 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.EqualsAndHashCode;
 import com.ecommerce.common.entity.BaseEntity;
 import java.math.BigDecimal;
 
+@EqualsAndHashCode(callSuper = false)
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -29,6 +31,7 @@ public class Payment extends BaseEntity {
     @Column(name = "amount", nullable = false)
     private BigDecimal amount;
 
+    @Builder.Default
     @Column(name = "currency", nullable = false)
     private String currency = "INR";
 

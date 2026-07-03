@@ -1,7 +1,14 @@
 spring:
   application:
     name: api-gateway
+  main:
+    web-application-type: reactive
+  config:
+    import: optional:configserver:${SPRING_CLOUD_CONFIG_URI:http://localhost:8888}
   cloud:
+    config:
+      username: admin
+      password: admin
     gateway:
       discovery:
         locator:
@@ -14,10 +21,19 @@ server:
 eureka:
   client:
     serviceUrl:
-      defaultZone: http://admin:admin@localhost:8761/eureka/
+      defaultZone: ${EUREKA_CLIENT_SERVICEURL_DEFAULTZONE:http://admin:admin@localhost:8761/eureka/}
   instance:
     preferIpAddress: false
     instanceId: ${spring.application.name}:${random.value}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  endpoint:
+    health:
+      show-details: always
 
 logging:
   level:

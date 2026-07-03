@@ -1,0 +1,12 @@
+.git
+.github
+.idea
+.junie
+logs
+build.log
+build-full.log
+query
+stop
+**/target
+**/node_modules
+frontend/dist

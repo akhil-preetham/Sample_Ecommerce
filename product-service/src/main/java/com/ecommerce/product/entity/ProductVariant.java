@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import com.ecommerce.common.entity.BaseEntity;
 import java.math.BigDecimal;
@@ -12,6 +13,7 @@ import java.math.BigDecimal;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@EqualsAndHashCode(callSuper = true)
 @Entity
 @Table(name = "product_variants", indexes = {
     @Index(name = "idx_product_id", columnList = "product_id")
@@ -34,5 +36,6 @@ public class ProductVariant extends BaseEntity {
     private String sku;
 
     @Column(name = "stock", nullable = false)
+    @Builder.Default
     private Long stock = 0L;
 }

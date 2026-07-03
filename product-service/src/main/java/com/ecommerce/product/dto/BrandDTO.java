@@ -22,5 +22,6 @@ public class BrandDTO {
     @Size(max = 1000, message = "Description cannot exceed 1000 characters")
     private String description;
 
+    @Builder.Default
     private Boolean isActive = true;
 }

@@ -2,15 +2,18 @@ spring:
   application:
     name: user-service
   datasource:
-    url: jdbc:mysql://${DB_HOST:localhost}:${DB_PORT:3306}/user_service_db?useSSL=true&serverTimezone=UTC
+    url: jdbc:mysql://${USER_DB_HOST:127.0.0.1}:${USER_DB_PORT:3406}/user_service_db?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true&createDatabaseIfNotExist=true
     username: ${DB_USERNAME:root}
-    password: ${DB_PASSWORD:rootpassword}
-    hikari:
-      maximum-pool-size: 20
-      minimum-idle: 5
+    password: ${DB_PASSWORD:${MYSQL_ROOT_PASSWORD:rootpassword}}
   jpa:
     hibernate:
-      ddl-auto: validate
+      ddl-auto: update
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+    url: jdbc:mysql://${USER_DB_HOST:127.0.0.1}:${USER_DB_PORT:3406}/user_service_db?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true&createDatabaseIfNotExist=true
+    user: ${DB_USERNAME:root}
+    password: ${DB_PASSWORD:${MYSQL_ROOT_PASSWORD:rootpassword}}
 
 server:
   port: 8081
@@ -21,8 +24,3 @@ eureka:
       defaultZone: http://admin:admin@localhost:8761/eureka/
   instance:
     preferIpAddress: false
-
-logging:
-  level:
-    root: INFO
-    com.ecommerce: DEBUG

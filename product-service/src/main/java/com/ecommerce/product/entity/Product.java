@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import com.ecommerce.common.entity.BaseEntity;
 import java.math.BigDecimal;
@@ -12,6 +13,7 @@ import java.math.BigDecimal;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@EqualsAndHashCode(callSuper = true)
 @Entity
 @Table(name = "products", indexes = {
     @Index(name = "idx_name", columnList = "name"),
@@ -42,17 +44,21 @@ public class Product extends BaseEntity {
     private BigDecimal basePrice;
 
     @Column(name = "rating")
+    @Builder.Default
     private Double rating = 0.0;
 
     @Column(name = "review_count")
+    @Builder.Default
     private Long reviewCount = 0L;
 
     @Column(name = "is_active", nullable = false)
+    @Builder.Default
     private Boolean isActive = true;
 
     @Column(name = "sku", unique = true)
     private String sku;
 
     @Column(name = "stock")
+    @Builder.Default
     private Long stock = 0L;
 }

@@ -5,9 +5,11 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.EqualsAndHashCode;
 import com.ecommerce.common.entity.BaseEntity;
 import java.math.BigDecimal;
 
+@EqualsAndHashCode(callSuper = false)
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -27,6 +29,7 @@ public class CartItem extends BaseEntity {
     @Column(name = "product_variant_id", nullable = false)
     private String productVariantId;
 
+    @Builder.Default
     @Column(name = "quantity", nullable = false)
     private Long quantity = 1L;
 

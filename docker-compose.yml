@@ -1,29 +1,27 @@
-version: '3.8'
-
 services:
-  # MySQL Databases
   mysql-user-db:
     image: mysql:8.0
     container_name: user-service-db
     environment:
-      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
       MYSQL_DATABASE: user_service_db
     ports:
-      - "3306:3306"
+      - "3312:3306"
     volumes:
       - user_db_data:/var/lib/mysql
     networks:
       - ecommerce-network
     healthcheck:
-      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost" ]
-      timeout: 20s
+      test: ["CMD-SHELL", "mysqladmin ping -h localhost -p${MYSQL_ROOT_PASSWORD} || exit 1"]
+      interval: 10s
+      timeout: 10s
       retries: 10
 
   mysql-product-db:
     image: mysql:8.0
     container_name: product-service-db
     environment:
-      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
       MYSQL_DATABASE: product_service_db
     ports:
       - "3307:3306"
@@ -32,15 +30,16 @@ services:
     networks:
       - ecommerce-network
     healthcheck:
-      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost" ]
-      timeout: 20s
+      test: ["CMD-SHELL", "mysqladmin ping -h localhost -p${MYSQL_ROOT_PASSWORD} || exit 1"]
+      interval: 10s
+      timeout: 10s
       retries: 10
 
   mysql-inventory-db:
     image: mysql:8.0
     container_name: inventory-service-db
     environment:
-      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
       MYSQL_DATABASE: inventory_service_db
     ports:
       - "3308:3306"
@@ -49,15 +48,16 @@ services:
     networks:
       - ecommerce-network
     healthcheck:
-      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost" ]
-      timeout: 20s
+      test: ["CMD-SHELL", "mysqladmin ping -h localhost -p${MYSQL_ROOT_PASSWORD} || exit 1"]
+      interval: 10s
+      timeout: 10s
       retries: 10
 
   mysql-order-db:
     image: mysql:8.0
     container_name: order-service-db
     environment:
-      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
       MYSQL_DATABASE: order_service_db
     ports:
       - "3309:3306"
@@ -66,15 +66,16 @@ services:
     networks:
       - ecommerce-network
     healthcheck:
-      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost" ]
-      timeout: 20s
+      test: ["CMD-SHELL", "mysqladmin ping -h localhost -p${MYSQL_ROOT_PASSWORD} || exit 1"]
+      interval: 10s
+      timeout: 10s
       retries: 10
 
   mysql-payment-db:
     image: mysql:8.0
     container_name: payment-service-db
     environment:
-      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
       MYSQL_DATABASE: payment_service_db
     ports:
       - "3310:3306"
@@ -83,15 +84,16 @@ services:
     networks:
       - ecommerce-network
     healthcheck:
-      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost" ]
-      timeout: 20s
+      test: ["CMD-SHELL", "mysqladmin ping -h localhost -p${MYSQL_ROOT_PASSWORD} || exit 1"]
+      interval: 10s
+      timeout: 10s
       retries: 10
 
   mysql-notification-db:
     image: mysql:8.0
     container_name: notification-service-db
     environment:
-      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
       MYSQL_DATABASE: notification_service_db
     ports:
       - "3311:3306"
@@ -100,11 +102,11 @@ services:
     networks:
       - ecommerce-network
     healthcheck:
-      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost" ]
-      timeout: 20s
+      test: ["CMD-SHELL", "mysqladmin ping -h localhost -p${MYSQL_ROOT_PASSWORD} || exit 1"]
+      interval: 10s
+      timeout: 10s
       retries: 10
 
-  # Redis Cache
   redis:
     image: redis:7-alpine
     container_name: ecommerce-redis
@@ -115,17 +117,17 @@ services:
     networks:
       - ecommerce-network
     healthcheck:
-      test: [ "CMD", "redis-cli", "ping" ]
-      timeout: 20s
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
       retries: 10
 
-  # RabbitMQ Message Queue
   rabbitmq:
     image: rabbitmq:3-management-alpine
     container_name: ecommerce-rabbitmq
     environment:
-      RABBITMQ_DEFAULT_USER: admin
-      RABBITMQ_DEFAULT_PASS: admin
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_DEFAULT_USER}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_DEFAULT_PASS}
     ports:
       - "5672:5672"
       - "15672:15672"
@@ -134,9 +136,298 @@ services:
     networks:
       - ecommerce-network
     healthcheck:
-      test: [ "CMD", "rabbitmq-diagnostics", "ping" ]
-      timeout: 20s
+      test: ["CMD", "rabbitmq-diagnostics", "ping"]
+      interval: 10s
+      timeout: 10s
       retries: 10
+
+  discovery-server:
+    build:
+      context: ./discovery-server
+      dockerfile: Dockerfile
+    container_name: discovery-server
+    environment:
+      EUREKA_PASSWORD: admin
+    ports:
+      - "8761:8761"
+    networks:
+      - ecommerce-network
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS -u admin:admin http://localhost:8761/actuator/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    depends_on:
+      mysql-user-db:
+        condition: service_healthy
+      mysql-product-db:
+        condition: service_healthy
+      mysql-inventory-db:
+        condition: service_healthy
+      mysql-order-db:
+        condition: service_healthy
+      mysql-payment-db:
+        condition: service_healthy
+      mysql-notification-db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+
+  config-server:
+    build:
+      context: ./config-server
+      dockerfile: Dockerfile
+    container_name: config-server
+    environment:
+      SPRING_PROFILES_ACTIVE: native
+      CONFIG_REPO_LOCATION: file:///config-repo
+      CONFIG_SERVER_PASSWORD: admin
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://admin:admin@discovery-server:8761/eureka/
+    volumes:
+      - ./config-repo:/config-repo:ro
+    ports:
+      - "8888:8888"
+    networks:
+      - ecommerce-network
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS -u admin:admin http://localhost:8888/actuator/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    depends_on:
+      discovery-server:
+        condition: service_healthy
+
+  api-gateway:
+    build:
+      context: ./api-gateway
+      dockerfile: Dockerfile
+    container_name: api-gateway
+    environment:
+      SPRING_CONFIG_IMPORT: configserver:http://config-server:8888
+      SPRING_CLOUD_CONFIG_USERNAME: admin
+      SPRING_CLOUD_CONFIG_PASSWORD: admin
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://admin:admin@discovery-server:8761/eureka/
+    ports:
+      - "8080:8080"
+    networks:
+      - ecommerce-network
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://localhost:8080/actuator/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    depends_on:
+      discovery-server:
+        condition: service_healthy
+      config-server:
+        condition: service_healthy
+
+  user-service:
+    build:
+      context: ./user-service
+      dockerfile: Dockerfile
+    container_name: user-service
+    environment:
+      SPRING_CONFIG_IMPORT: configserver:http://config-server:8888
+      SPRING_CLOUD_CONFIG_USERNAME: admin
+      SPRING_CLOUD_CONFIG_PASSWORD: admin
+      CONFIG_SERVER_PASSWORD: admin
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://admin:admin@discovery-server:8761/eureka/
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      JWT_SECRET: ${JWT_SECRET}
+    ports:
+      - "8081:8081"
+    networks:
+      - ecommerce-network
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://localhost:8081/actuator/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    depends_on:
+      mysql-user-db:
+        condition: service_healthy
+      discovery-server:
+        condition: service_healthy
+      config-server:
+        condition: service_healthy
+
+  product-service:
+    build:
+      context: ./product-service
+      dockerfile: Dockerfile
+    container_name: product-service
+    environment:
+      SPRING_CONFIG_IMPORT: configserver:http://config-server:8888
+      SPRING_CLOUD_CONFIG_USERNAME: admin
+      SPRING_CLOUD_CONFIG_PASSWORD: admin
+      CONFIG_SERVER_PASSWORD: admin
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://admin:admin@discovery-server:8761/eureka/
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      JWT_SECRET: ${JWT_SECRET}
+    ports:
+      - "8082:8082"
+    networks:
+      - ecommerce-network
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://localhost:8082/actuator/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    depends_on:
+      mysql-product-db:
+        condition: service_healthy
+      discovery-server:
+        condition: service_healthy
+      config-server:
+        condition: service_healthy
+
+  inventory-service:
+    build:
+      context: ./inventory-service
+      dockerfile: Dockerfile
+    container_name: inventory-service
+    environment:
+      SPRING_CONFIG_IMPORT: configserver:http://config-server:8888
+      SPRING_CLOUD_CONFIG_USERNAME: admin
+      SPRING_CLOUD_CONFIG_PASSWORD: admin
+      CONFIG_SERVER_PASSWORD: admin
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://admin:admin@discovery-server:8761/eureka/
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      JWT_SECRET: ${JWT_SECRET}
+    ports:
+      - "8083:8083"
+    networks:
+      - ecommerce-network
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://localhost:8083/actuator/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    depends_on:
+      mysql-inventory-db:
+        condition: service_healthy
+      discovery-server:
+        condition: service_healthy
+      config-server:
+        condition: service_healthy
+
+  order-service:
+    build:
+      context: ./order-service
+      dockerfile: Dockerfile
+    container_name: order-service
+    environment:
+      SPRING_CONFIG_IMPORT: configserver:http://config-server:8888
+      SPRING_CLOUD_CONFIG_USERNAME: admin
+      SPRING_CLOUD_CONFIG_PASSWORD: admin
+      CONFIG_SERVER_PASSWORD: admin
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://admin:admin@discovery-server:8761/eureka/
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      JWT_SECRET: ${JWT_SECRET}
+    ports:
+      - "8084:8084"
+    networks:
+      - ecommerce-network
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://localhost:8084/actuator/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    depends_on:
+      mysql-order-db:
+        condition: service_healthy
+      discovery-server:
+        condition: service_healthy
+      config-server:
+        condition: service_healthy
+
+  payment-service:
+    build:
+      context: ./payment-service
+      dockerfile: Dockerfile
+    container_name: payment-service
+    environment:
+      SPRING_CONFIG_IMPORT: configserver:http://config-server:8888
+      SPRING_CLOUD_CONFIG_USERNAME: admin
+      SPRING_CLOUD_CONFIG_PASSWORD: admin
+      CONFIG_SERVER_PASSWORD: admin
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://admin:admin@discovery-server:8761/eureka/
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      JWT_SECRET: ${JWT_SECRET}
+    ports:
+      - "8085:8085"
+    networks:
+      - ecommerce-network
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://localhost:8085/actuator/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    depends_on:
+      mysql-payment-db:
+        condition: service_healthy
+      discovery-server:
+        condition: service_healthy
+      config-server:
+        condition: service_healthy
+
+  notification-service:
+    build:
+      context: ./notification-service
+      dockerfile: Dockerfile
+    container_name: notification-service
+    environment:
+      SPRING_CONFIG_IMPORT: configserver:http://config-server:8888
+      SPRING_CLOUD_CONFIG_USERNAME: admin
+      SPRING_CLOUD_CONFIG_PASSWORD: admin
+      CONFIG_SERVER_PASSWORD: admin
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://admin:admin@discovery-server:8761/eureka/
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      JWT_SECRET: ${JWT_SECRET}
+      RABBITMQ_HOST: rabbitmq
+      RABBITMQ_PORT: 5672
+      RABBITMQ_USERNAME: ${RABBITMQ_DEFAULT_USER}
+      RABBITMQ_PASSWORD: ${RABBITMQ_DEFAULT_PASS}
+    ports:
+      - "8086:8086"
+    networks:
+      - ecommerce-network
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://localhost:8086/actuator/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    depends_on:
+      mysql-notification-db:
+        condition: service_healthy
+      discovery-server:
+        condition: service_healthy
+      config-server:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: ecommerce-frontend
+    ports:
+      - "4200:80"
+    networks:
+      - ecommerce-network
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q -O /dev/null http://localhost/ || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    depends_on:
+      api-gateway:
+        condition: service_healthy
 
 volumes:
   user_db_data:

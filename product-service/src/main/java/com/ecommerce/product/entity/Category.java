@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import com.ecommerce.common.entity.BaseEntity;
 
@@ -11,6 +12,7 @@ import com.ecommerce.common.entity.BaseEntity;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@EqualsAndHashCode(callSuper = true)
 @Entity
 @Table(name = "categories", indexes = {
     @Index(name = "idx_name", columnList = "name", unique = true),
@@ -28,5 +30,6 @@ public class Category extends BaseEntity {
     private String description;
 
     @Column(name = "is_active", nullable = false)
+    @Builder.Default
     private Boolean isActive = true;
 }

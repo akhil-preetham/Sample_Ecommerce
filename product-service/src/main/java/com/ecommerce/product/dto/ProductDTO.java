@@ -40,12 +40,14 @@ public class ProductDTO {
     @Min(value = 0, message = "Review count cannot be negative")
     private Long reviewCount;
 
+    @Builder.Default
     private Boolean isActive = true;
 
     @Size(max = 100, message = "SKU cannot exceed 100 characters")
     private String sku;
 
     @Min(value = 0, message = "Stock cannot be negative")
+    @Builder.Default
     private Long stock = 0L;
 
     private List<ProductVariantDTO> variants;

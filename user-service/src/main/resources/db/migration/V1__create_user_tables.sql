@@ -2,7 +2,7 @@
 -- Created: Phase 5
 
 CREATE TABLE IF NOT EXISTS users (
-    id VARCHAR(36) PRIMARY KEY,
+                                     id VARCHAR(36) PRIMARY KEY,
     email VARCHAR(255) NOT NULL UNIQUE,
     password_hash VARCHAR(255) NOT NULL,
     first_name VARCHAR(100),
@@ -17,19 +17,22 @@ CREATE TABLE IF NOT EXISTS users (
     INDEX idx_email (email),
     INDEX idx_created_at (created_at),
     INDEX idx_is_active (is_active)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS user_roles (
-    id BIGINT AUTO_INCREMENT PRIMARY KEY,
-    user_id VARCHAR(36) NOT NULL,
+                                          id BIGINT AUTO_INCREMENT PRIMARY KEY,
+                                          user_id VARCHAR(36) NOT NULL,
     role VARCHAR(50) NOT NULL,
-    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
-    INDEX idx_user_id (user_id),
-    UNIQUE KEY unique_user_role (user_id, role)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+    CONSTRAINT fk_user_roles_user
+    FOREIGN KEY (user_id)
+    REFERENCES users(id)
+    ON DELETE CASCADE,
+    INDEX idx_user_roles_user_id (user_id),
+    UNIQUE KEY uk_user_role (user_id, role)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS user_addresses (
-    id VARCHAR(36) PRIMARY KEY,
+                                              id VARCHAR(36) PRIMARY KEY,
     user_id VARCHAR(36) NOT NULL,
     address_type VARCHAR(50) NOT NULL,
     street VARCHAR(255) NOT NULL,
@@ -44,32 +47,33 @@ CREATE TABLE IF NOT EXISTS user_addresses (
     updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     created_by VARCHAR(36),
     updated_by VARCHAR(36),
-    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
-    INDEX idx_user_id (user_id),
-    INDEX idx_is_default (is_default)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+    CONSTRAINT fk_user_addresses_user
+    FOREIGN KEY (user_id)
+    REFERENCES users(id)
+                                                            ON DELETE CASCADE,
+    INDEX idx_user_addresses_user_id (user_id),
+    INDEX idx_user_addresses_default (is_default)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS refresh_tokens (
-    id VARCHAR(36) PRIMARY KEY,
+                                              id VARCHAR(36) PRIMARY KEY,
     user_id VARCHAR(36) NOT NULL,
     token LONGTEXT NOT NULL,
     token_hash VARCHAR(64) NOT NULL UNIQUE,
     expiry_date TIMESTAMP NOT NULL,
     is_revoked BOOLEAN NOT NULL DEFAULT false,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
-    INDEX idx_user_id (user_id),
-    INDEX idx_token (token_hash),
-    INDEX idx_expiry_date (expiry_date)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+    CONSTRAINT fk_refresh_tokens_user
+    FOREIGN KEY (user_id)
+    REFERENCES users(id)
+    ON DELETE CASCADE,
+    INDEX idx_refresh_tokens_user_id (user_id),
+    INDEX idx_refresh_tokens_token_hash (token_hash),
+    INDEX idx_refresh_tokens_expiry_date (expiry_date)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Insert default roles if they don't exist
-INSERT INTO user_roles (user_id, role) 
-SELECT 'system', 'CUSTOMER' 
-WHERE NOT EXISTS (SELECT 1 FROM user_roles WHERE role='CUSTOMER')
-LIMIT 1;
-
-INSERT INTO user_roles (user_id, role) 
-SELECT 'system', 'ADMINISTRATOR' 
-WHERE NOT EXISTS (SELECT 1 FROM user_roles WHERE role='ADMINISTRATOR')
-LIMIT 1;
+-- NOTE:
+-- Roles are assigned when a user is created.
+-- No seed data is inserted here because user_roles has a foreign key
+-- to users(id), and inserting roles without an existing user causes
+-- a Flyway migration failure.

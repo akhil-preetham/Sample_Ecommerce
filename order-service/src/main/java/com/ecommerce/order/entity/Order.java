@@ -5,9 +5,11 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.EqualsAndHashCode;
 import com.ecommerce.common.entity.BaseEntity;
 import java.math.BigDecimal;
 
+@EqualsAndHashCode(callSuper = false)
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -36,12 +38,15 @@ public class Order extends BaseEntity {
     @Column(name = "total_amount", nullable = false)
     private BigDecimal totalAmount;
 
+    @Builder.Default
     @Column(name = "tax")
     private BigDecimal tax = BigDecimal.ZERO;
 
+    @Builder.Default
     @Column(name = "shipping")
     private BigDecimal shipping = BigDecimal.ZERO;
 
+    @Builder.Default
     @Column(name = "discount")
     private BigDecimal discount = BigDecimal.ZERO;
 

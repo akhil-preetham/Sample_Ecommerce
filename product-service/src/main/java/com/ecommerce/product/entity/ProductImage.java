@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import com.ecommerce.common.entity.BaseEntity;
 
@@ -11,6 +12,7 @@ import com.ecommerce.common.entity.BaseEntity;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@EqualsAndHashCode(callSuper = true)
 @Entity
 @Table(name = "product_images", indexes = {
     @Index(name = "idx_product_id", columnList = "product_id")
@@ -30,8 +32,10 @@ public class ProductImage extends BaseEntity {
     private String altText;
 
     @Column(name = "is_default")
+    @Builder.Default
     private Boolean isDefault = false;
 
     @Column(name = "display_order")
+    @Builder.Default
     private Integer displayOrder = 0;
 }

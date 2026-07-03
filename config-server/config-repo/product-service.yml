@@ -1,11 +1,19 @@
-# Product Service Configuration
 spring:
   application:
     name: product-service
   datasource:
-    url: jdbc:mysql://${DB_HOST:localhost}:${DB_PORT:3306}/product_service_db?useSSL=true&serverTimezone=UTC
+    url: jdbc:mysql://${PRODUCT_DB_HOST:127.0.0.1}:${PRODUCT_DB_PORT:3406}/product_service_db?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true&createDatabaseIfNotExist=true
     username: ${DB_USERNAME:root}
-    password: ${DB_PASSWORD:rootpassword}
+    password: ${DB_PASSWORD:${MYSQL_ROOT_PASSWORD:rootpassword}}
+  jpa:
+    hibernate:
+      ddl-auto: update
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+    url: jdbc:mysql://${PRODUCT_DB_HOST:127.0.0.1}:${PRODUCT_DB_PORT:3406}/product_service_db?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true&createDatabaseIfNotExist=true
+    user: ${DB_USERNAME:root}
+    password: ${DB_PASSWORD:${MYSQL_ROOT_PASSWORD:rootpassword}}
 
 server:
   port: 8082
@@ -16,13 +24,3 @@ eureka:
       defaultZone: http://admin:admin@localhost:8761/eureka/
   instance:
     preferIpAddress: false
-
----
-spring:
-  config:
-    activate:
-      on-profile: prod
-
-eureka:
-  instance:
-    instanceId: ${spring.application.name}:${random.value}

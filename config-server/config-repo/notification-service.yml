@@ -1,11 +1,27 @@
-# Notification Service Configuration
 spring:
   application:
     name: notification-service
   datasource:
-    url: jdbc:mysql://${DB_HOST:localhost}:${DB_PORT:3306}/notification_service_db?useSSL=true&serverTimezone=UTC
+    url: jdbc:mysql://${NOTIFICATION_DB_HOST:127.0.0.1}:${NOTIFICATION_DB_PORT:3406}/notification_service_db?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true&createDatabaseIfNotExist=true
     username: ${DB_USERNAME:root}
-    password: ${DB_PASSWORD:rootpassword}
+    password: ${DB_PASSWORD:${MYSQL_ROOT_PASSWORD:rootpassword}}
+  jpa:
+    hibernate:
+      ddl-auto: update
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+    url: jdbc:mysql://${NOTIFICATION_DB_HOST:127.0.0.1}:${NOTIFICATION_DB_PORT:3406}/notification_service_db?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true&createDatabaseIfNotExist=true
+    user: ${DB_USERNAME:root}
+    password: ${DB_PASSWORD:${MYSQL_ROOT_PASSWORD:rootpassword}}
+  rabbitmq:
+    host: ${RABBITMQ_HOST:localhost}
+    port: ${RABBITMQ_PORT:5672}
+    username: ${RABBITMQ_USERNAME:${RABBITMQ_DEFAULT_USER:admin}}
+    password: ${RABBITMQ_PASSWORD:${RABBITMQ_DEFAULT_PASS:admin}}
+    listener:
+      simple:
+        auto-startup: false
 
 server:
   port: 8086
